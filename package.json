@@ -1,0 +1,12 @@
+{
+  "name": "segundo-entregable",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "tailwind:build": "tailwindcss -i ./static/src/tailwind.css -o ./static/css/tailwind.css --minify",
+    "tailwind:watch": "tailwindcss -i ./static/src/tailwind.css -o ./static/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

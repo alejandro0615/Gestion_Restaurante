@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Encabezado de confirmación tras guardar el pedido #}
+<div class="mb-6 rounded-2xl bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 p-6 text-white shadow-lg">
+    <h2 class="mb-2 text-3xl font-bold">Pedido confirmado</h2>
+    <p class="text-emerald-100">Gracias por tu compra, {{ pedido.cliente.nombre }}.</p>
+    <p class="mt-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
+        Estado actual: {{ pedido.get_estado_display }}
+    </p>
+</div>
+
+<p class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 shadow-sm">
+    Tu pedido fue enviado al panel administrativo para generar la venta y seguimiento.
+</p>
+
+{# Tarjeta con resumen económico y de fidelización del pedido #}
+<div class="mb-8 grid gap-3 rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-5 shadow-sm md:grid-cols-2">
+    <p class="text-sm"><strong>Pedido:</strong> #{{ pedido.id }}</p>
+    <p class="text-sm"><strong>Tipo de servicio:</strong> {{ pedido.get_tipo_servicio_display }}</p>
+    <p class="text-sm"><strong>Subtotal:</strong> ${{ pedido.subtotal }}</p>
+    <p class="text-sm"><strong>Descuento:</strong> ${{ pedido.descuento }}</p>
+    <p class="text-sm"><strong>Total:</strong> <span class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">${{ pedido.total }}</span></p>
+    <p class="text-sm"><strong>Puntos ganados:</strong> {{ pedido.puntos_ganados }}</p>
+    <p class="text-sm"><strong>Puntos redimidos:</strong> {{ pedido.puntos_redimidos }}</p>
+    <p class="text-sm"><strong>Puntos actuales del cliente:</strong> <span class="rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-blue-700">{{ pedido.cliente.puntos }}</span></p>
+    {% if pedido.promocion_aplicada %}
+        <p class="text-sm md:col-span-2"><strong>Promoción aplicada:</strong> {{ pedido.promocion_aplicada.titulo }}</p>
+    {% endif %}
+</div>
+
+{# Listado de ítems comprados en el pedido #}
+<h3 class="mb-3 text-xl font-semibold text-slate-900">Detalle</h3>
+<ul class="mb-6 list-inside list-disc space-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700 shadow-sm">
+    {% for item in pedido.items.all %}
+        <li>{{ item.cantidad }} x {{ item.producto.nombre }} - ${{ item.precio_unitario }}</li>
+    {% endfor %}
+</ul>
+
+{# Acción principal para regresar al catálogo de productos #}
+<a class="inline-flex rounded-xl bg-blue-600 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-500" href="{% url 'carta' %}">Volver a la carta</a>
+{% endblock %}

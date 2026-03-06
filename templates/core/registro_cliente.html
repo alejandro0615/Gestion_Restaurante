@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Encabezado principal del registro de cliente #}
+<div class="mb-8 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 p-6 text-white shadow-lg">
+    <h2 class="mb-2 text-3xl font-bold">Registro de cliente</h2>
+    <p class="text-sm text-emerald-100">Completa tus datos para crear tu cuenta y recibir una contraseña temporal en tu correo.</p>
+</div>
+
+{# Formulario de alta de cliente + usuario autenticable #}
+<form method="post" class="max-w-xl rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-sm">
+    {% csrf_token %}
+
+    <label class="mb-1 block text-sm font-medium text-slate-700">Nombre</label>
+    {{ form.nombre }}
+
+    <label class="mb-1 mt-3 block text-sm font-medium text-slate-700">Correo (Gmail recomendado)</label>
+    {{ form.email }}
+
+    <button class="mt-6 rounded-xl bg-emerald-600 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-500" type="submit">
+        Crear mi cuenta
+    </button>
+</form>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Mensaje principal al cerrar sesión #}
+<div class="max-w-2xl rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-sm">
+	<h2 class="mb-2 text-3xl font-bold text-slate-900">Sesión cerrada</h2>
+	<p class="mb-6 text-slate-600">Has salido de tu cuenta correctamente.</p>
+
+	{# Acción para regresar al login #}
+	<a class="inline-flex rounded-xl bg-blue-600 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-500" href="{% url 'login' %}">Volver a iniciar sesión</a>
+</div>
+{% endblock %}

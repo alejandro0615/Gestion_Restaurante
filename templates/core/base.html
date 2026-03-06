@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title >Dulce Pecado 😏</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <style>
+        :root {
+            --theme-ink: #1f2937;
+            --theme-deep: #12344c;
+            --theme-coral: #ff7b54;
+            --theme-peach: #ffd7b8;
+            --theme-mint: #2ec4b6;
+            --theme-sky: #5aa9ff;
+            --theme-cream: #fff9f3;
+            --theme-card: rgba(255, 255, 255, 0.88);
+            --theme-border: rgba(255, 255, 255, 0.7);
+            --theme-shadow: 0 14px 32px rgba(18, 52, 76, 0.14);
+        }
+
+        body.app-theme {
+            font-family: 'Manrope', system-ui, sans-serif;
+            color: var(--theme-ink);
+            background:
+                radial-gradient(circle at 12% 8%, rgba(255, 123, 84, 0.24), transparent 32%),
+                radial-gradient(circle at 88% 14%, rgba(46, 196, 182, 0.2), transparent 30%),
+                radial-gradient(circle at 25% 86%, rgba(90, 169, 255, 0.2), transparent 36%),
+                linear-gradient(130deg, #fffaf5 0%, #f5fffd 48%, #f3f8ff 100%);
+            background-attachment: fixed;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .font-black,
+        .font-bold {
+            font-family: 'Sora', 'Manrope', system-ui, sans-serif;
+            letter-spacing: -0.01em;
+        }
+
+        body.app-theme header {
+            background: linear-gradient(110deg, rgba(18, 52, 76, 0.92), rgba(30, 95, 137, 0.92));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow: 0 12px 30px rgba(18, 52, 76, 0.24);
+        }
+
+        body.app-theme main.card-soft {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.74));
+            border: 1px solid var(--theme-border);
+            box-shadow: var(--theme-shadow);
+        }
+
+        body.app-theme main .rounded-xl.border.bg-white,
+        body.app-theme main .rounded-2xl.border.bg-white,
+        body.app-theme main .rounded-xl.bg-white,
+        body.app-theme main .rounded-2xl.bg-white {
+            background: var(--theme-card);
+            border-color: rgba(90, 169, 255, 0.18);
+            box-shadow: 0 10px 24px rgba(18, 52, 76, 0.09);
+            transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+        }
+
+        body.app-theme main .rounded-xl.border.bg-white:hover,
+        body.app-theme main .rounded-2xl.border.bg-white:hover,
+        body.app-theme main .rounded-xl.bg-white:hover,
+        body.app-theme main .rounded-2xl.bg-white:hover {
+            transform: translateY(-2px);
+            border-color: rgba(46, 196, 182, 0.42);
+            box-shadow: 0 18px 32px rgba(18, 52, 76, 0.16);
+        }
+
+        body.app-theme .bg-slate-900 {
+            background: linear-gradient(90deg, #12344c, #1e5f89);
+        }
+
+        body.app-theme .bg-blue-600,
+        body.app-theme .bg-ocean-500,
+        body.app-theme .bg-brand-600 {
+            background: linear-gradient(110deg, #228be6, #2ec4b6);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 20px rgba(34, 139, 230, 0.24);
+        }
+
+        body.app-theme .bg-blue-600:hover,
+        body.app-theme .bg-ocean-500:hover,
+        body.app-theme .bg-brand-600:hover {
+            background: linear-gradient(110deg, #1d7bd0, #26ac9f);
+            box-shadow: 0 14px 24px rgba(34, 139, 230, 0.3);
+        }
+
+        body.app-theme .bg-sunset-500,
+        body.app-theme .bg-amber-500 {
+            background: linear-gradient(110deg, #ff7b54, #ffb866);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 22px rgba(255, 123, 84, 0.26);
+        }
+
+        body.app-theme .bg-sunset-500:hover,
+        body.app-theme .bg-amber-500:hover {
+            background: linear-gradient(110deg, #ef6f3f, #ffa94f);
+            box-shadow: 0 14px 26px rgba(255, 123, 84, 0.34);
+        }
+
+        /* Botones/enlaces claros: evita que se "pierdan" sobre fondos claros. */
+        body.app-theme button.bg-white,
+        body.app-theme a.bg-white,
+        body.app-theme input[type='button'].bg-white,
+        body.app-theme input[type='submit'].bg-white {
+            background: linear-gradient(120deg, #fffdf9, #ffeedb);
+            color: #16435f;
+            border: 1px solid rgba(22, 67, 95, 0.2);
+            box-shadow: 0 8px 18px rgba(18, 52, 76, 0.16);
+        }
+
+        body.app-theme button.bg-white:hover,
+        body.app-theme a.bg-white:hover,
+        body.app-theme input[type='button'].bg-white:hover,
+        body.app-theme input[type='submit'].bg-white:hover {
+            background: linear-gradient(120deg, #fff4ea, #ffdcbc);
+            border-color: rgba(22, 67, 95, 0.35);
+            box-shadow: 0 12px 22px rgba(18, 52, 76, 0.22);
+        }
+
+        body.app-theme button.bg-white:focus-visible,
+        body.app-theme a.bg-white:focus-visible,
+        body.app-theme input[type='button'].bg-white:focus-visible,
+        body.app-theme input[type='submit'].bg-white:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(34, 139, 230, 0.22), 0 12px 22px rgba(18, 52, 76, 0.22);
+        }
+
+        body.app-theme input,
+        body.app-theme select,
+        body.app-theme textarea {
+            border-color: rgba(18, 52, 76, 0.2);
+            background: rgba(255, 255, 255, 0.94);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        body.app-theme input:focus,
+        body.app-theme select:focus,
+        body.app-theme textarea:focus {
+            border-color: rgba(34, 139, 230, 0.45);
+            box-shadow: 0 0 0 3px rgba(34, 139, 230, 0.16);
+            background: #ffffff;
+        }
+
+        body.app-theme main > * {
+            animation: fadeSlideIn 0.45s ease both;
+        }
+
+        body.app-theme main > *:nth-child(2) { animation-delay: 0.05s; }
+        body.app-theme main > *:nth-child(3) { animation-delay: 0.1s; }
+        body.app-theme main > *:nth-child(4) { animation-delay: 0.15s; }
+        body.app-theme main > *:nth-child(5) { animation-delay: 0.2s; }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body.app-theme main > * {
+                animation: none;
+            }
+            body.app-theme main .rounded-xl.border.bg-white,
+            body.app-theme main .rounded-2xl.border.bg-white,
+            body.app-theme main .rounded-xl.bg-white,
+            body.app-theme main .rounded-2xl.bg-white {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body class="app-theme min-h-screen bg-gradient-to-br from-brand-50 via-ocean-50 to-sunset-50 text-slate-800">
+<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -left-16 -top-16 h-56 w-56 rounded-full bg-brand-500/20 blur-3xl"></div>
+    <div class="absolute -right-20 top-1/3 h-64 w-64 rounded-full bg-ocean-500/20 blur-3xl"></div>
+    <div class="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-sunset-500/20 blur-3xl"></div>
+</div>
+{# Encabezado principal de la aplicación con navegación global #}
+<header class="sticky top-0 z-30 border-b border-white/10 bg-brand-900/90 text-white shadow-lg backdrop-blur-xl">
+    <div class="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-5 md:flex-row md:items-center md:justify-between">
+        <h1 class="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-2xl font-black tracking-tight text-transparent">
+            <a href="{% url 'inicio' %}">Restaurante Dulce Pecado 💜</a>
+        </h1>
+        {# Menú principal para navegar por las secciones públicas y administrativas #}
+        <nav class="flex flex-wrap items-center gap-2 text-sm">
+            {% if user.is_staff %}
+                {# Menú admin en lista desplegable compacta #}
+                <details class="relative">
+                    <summary class="list-none cursor-pointer rounded-lg bg-sunset-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-sunset-600">Menú admin ▾</summary>
+                    <div class="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 text-slate-800 shadow-xl">
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="/admin/">Panel admin</a>
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'listar_clientes' %}">Clientes</a>
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'registrar_cliente_panel' %}">Registrar cliente</a>
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'gestionar_pedidos' %}">Pedidos web</a>
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'gestionar_menus' %}">Menús web</a>
+                    </div>
+                </details>
+            {% elif user.is_authenticated %}
+                {# Menú cliente en lista desplegable compacta #}
+                <details class="relative">
+                    <summary class="list-none cursor-pointer rounded-lg bg-sunset-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-sunset-600">Menú cliente ▾</summary>
+                    <div class="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-2 text-slate-800 shadow-xl">
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'inicio' %}">Inicio</a>
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'carta' %}">Carta</a>
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'crear_pedido' %}">Hacer pedido</a>
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'canjear_codigos' %}">Canjear códigos</a>
+                        <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'descargar_carta_pdf' %}">Descargar carta PDF</a>
+                    </div>
+                </details>
+            {% else %}
+                {# Menú público del login: solo carta en línea y descarga PDF #}
+                <a class="rounded-lg bg-ocean-500 px-3 py-2 font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-ocean-600" href="{% url 'carta' %}">Ver carta</a>
+                <a class="rounded-lg bg-sunset-500 px-3 py-2 font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-sunset-600" href="{% url 'descargar_carta_pdf' %}">Descargar PDF</a>
+            {% endif %}
+            {% if user.is_authenticated %}
+                {# Estado de sesión cuando el usuario ya inició autenticación #}
+                <span class="rounded-lg bg-ocean-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm">Hola, {{ user.username }}</span>
+                {% if user.is_staff %}
+                    <details class="relative">
+                        <summary class="list-none cursor-pointer rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-500">Cuenta ▾</summary>
+                        <div class="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-slate-200 bg-white p-2 text-slate-800 shadow-xl">
+                            <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'cambiar_contraseña' %}">Cambiar contraseña</a>
+                            <form method="post" action="{% url 'logout' %}" class="mt-1">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full rounded-lg px-3 py-2 text-left text-xs font-medium transition hover:bg-slate-100">Cerrar sesión</button>
+                            </form>
+                        </div>
+                    </details>
+                {% else %}
+                    <details class="relative">
+                        <summary class="list-none cursor-pointer rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-500">Cuenta ▾</summary>
+                        <div class="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-slate-200 bg-white p-2 text-slate-800 shadow-xl">
+                            <a class="block rounded-lg px-3 py-2 text-xs font-medium transition hover:bg-slate-100" href="{% url 'cambiar_contraseña' %}">Cambiar contraseña</a>
+                            <form method="post" action="{% url 'logout' %}" class="mt-1">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full rounded-lg px-3 py-2 text-left text-xs font-medium transition hover:bg-slate-100">Cerrar sesión</button>
+                            </form>
+                        </div>
+                    </details>
+                {% endif %}
+            {% else %}
+                {# Acceso al formulario de autenticación para usuarios anónimos #}
+                <a class="rounded-lg bg-ocean-500 px-3 py-2 font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-ocean-600" href="{% url 'login' %}">Iniciar sesión</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+{# Contenedor central donde se renderiza el contenido de cada vista #}
+<main class="card-soft mx-auto my-6 w-full max-w-6xl p-5 md:p-8">
+    {% if messages %}
+        {# Mensajes del framework de Django para feedback al usuario #}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+                <div class="rounded-lg border px-4 py-3 text-sm shadow-sm {% if message.tags == 'success' %}border-emerald-200 bg-emerald-50 text-emerald-800{% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-800{% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800{% else %}border-slate-200 bg-slate-50 text-slate-700{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% block contenido %}{% endblock %}
+</main>
+
+{# Pie de página informativo del prototipo #}
+<footer class="py-8 text-center text-sm text-brand-700">
+    Prototipo de fidelización para restaurante
+</footer>
+</body>
+</html>

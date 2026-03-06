@@ -1,0 +1,170 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Encabezado principal de gestión operativa de menús #}
+<div class="mb-6 rounded-2xl bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 p-6 text-white shadow-lg">
+    <h2 class="text-3xl font-bold">Gestión de menús por día</h2>
+    <p class="mt-1 text-sm text-indigo-100">Solo se muestran productos agregados; usa filtro para buscar más y agregarlos.</p>
+</div>
+
+{# Selector por día y filtro de búsqueda para traer productos extra solo cuando se necesite #}
+<form method="get" class="mb-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <label class="mb-1 block text-sm font-medium text-slate-700">Día a gestionar</label>
+    <div class="grid gap-2 md:grid-cols-[minmax(220px,300px)_1fr_auto] md:items-end">
+        <select name="dia" class="w-full max-w-sm rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring">
+            {% for clave, etiqueta in dias_semana %}
+                <option value="{{ clave }}" {% if dia == clave %}selected{% endif %}>{{ etiqueta }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="q" value="{{ q }}" placeholder="Filtrar para agregar/editar (ej: alitas)" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring" />
+        <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Filtrar</button>
+    </div>
+</form>
+
+{# Formulario principal para activar menú y definir productos del día #}
+<form method="post" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    {% csrf_token %}
+    <input type="hidden" name="dia" value="{{ dia }}">
+    <input type="hidden" name="action" value="guardar_menu">
+
+    <div class="mb-4 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div>
+            <h3 class="text-lg font-semibold text-slate-900">Menú de {{ menu.get_dia_semana_display }}</h3>
+            <p class="text-sm text-slate-600">Mantén marcados los agregados y usa el filtro para añadir nuevos productos.</p>
+        </div>
+        <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+            <input type="checkbox" name="activa" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" {% if menu.activa %}checked{% endif %}>
+            Menú activo
+        </label>
+    </div>
+
+    <h4 class="mb-3 text-sm font-semibold uppercase tracking-wide text-emerald-800">Productos agregados</h4>
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {% for producto in productos_agregados %}
+            <div class="rounded-xl p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md {% if producto.id in productos_ocultos %}border border-slate-200 bg-slate-50{% else %}border border-emerald-200 bg-emerald-50{% endif %}">
+                <div class="mb-3 flex items-start justify-between gap-3">
+                    <div>
+                        <p class="font-semibold text-slate-900">{{ producto.nombre }}</p>
+                        <p class="mt-1 text-xs text-slate-500">{{ producto.categoria.nombre|default:'Sin categoría' }}</p>
+                        <p class="mt-2 text-xs text-slate-600">{{ producto.descripcion|default:'Sin descripción' }}</p>
+                        <p class="mt-2 text-sm font-semibold text-emerald-700">${{ producto.precio }}</p>
+                        {% if producto.id in productos_ocultos %}
+                            <p class="mt-2 inline-flex rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-700">Oculto en carta/pedido</p>
+                        {% else %}
+                            <p class="mt-2 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">Visible en carta/pedido</p>
+                        {% endif %}
+                    </div>
+                    <a href="?dia={{ dia }}{% if q %}&q={{ q|urlencode }}{% endif %}&producto_id={{ producto.id }}" class="rounded-lg bg-indigo-100 px-2.5 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-200">Editar</a>
+                </div>
+                <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <input type="checkbox" name="productos" value="{{ producto.id }}" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" {% if producto.id in productos_seleccionados %}checked{% endif %}>
+                    Incluir en menú visible
+                </label>
+            </div>
+        {% empty %}
+            <p class="text-sm text-slate-500">Aún no hay productos agregados para este día.</p>
+        {% endfor %}
+    </div>
+
+    <h4 class="mb-3 mt-6 text-sm font-semibold uppercase tracking-wide text-indigo-800">Resultados del filtro para agregar</h4>
+    {% if q %}
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {% for producto in productos_filtrados %}
+                <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                    <div class="mb-3 flex items-start justify-between gap-3">
+                        <div>
+                            <p class="font-semibold text-slate-900">{{ producto.nombre }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ producto.categoria.nombre|default:'Sin categoría' }}</p>
+                            <p class="mt-2 text-xs text-slate-600">{{ producto.descripcion|default:'Sin descripción' }}</p>
+                            <p class="mt-2 text-sm font-semibold text-emerald-700">${{ producto.precio }}</p>
+                        </div>
+                        <a href="?dia={{ dia }}&q={{ q|urlencode }}&producto_id={{ producto.id }}" class="rounded-lg bg-indigo-100 px-2.5 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-200">Editar</a>
+                    </div>
+                    <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                        <input type="checkbox" name="productos" value="{{ producto.id }}" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                        Incluir en menú
+                    </label>
+                </div>
+            {% empty %}
+                <p class="text-sm text-slate-500">No hay coincidencias disponibles para "{{ q }}".</p>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-sm text-slate-500">Escribe un filtro para buscar más productos y agregarlos al menú.</p>
+    {% endif %}
+
+    <div class="mt-6 flex items-center justify-between gap-3">
+        <span class="text-sm text-slate-600">Productos seleccionados: <strong id="contador-seleccion">0</strong></span>
+        <button type="submit" class="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500">Guardar menú del día</button>
+    </div>
+</form>
+
+{# Panel de edición de producto seleccionado sin salir de la vista de menús #}
+{% if producto_editar and producto_form %}
+<form method="post" class="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="editar_producto">
+    <input type="hidden" name="dia" value="{{ dia }}">
+    <input type="hidden" name="producto_id" value="{{ producto_editar.id }}">
+
+    <div class="mb-4 flex items-center justify-between gap-3">
+        <div>
+            <h4 class="text-lg font-semibold text-slate-900">Editando: {{ producto_editar.nombre }}</h4>
+            <p class="text-sm text-slate-600">Actualiza la información del producto para reflejar cambios de menú.</p>
+        </div>
+        <a href="?dia={{ dia }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100">Cerrar edición</a>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2">
+        <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Nombre</label>
+            {{ producto_form.nombre }}
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Categoría</label>
+            {{ producto_form.categoria }}
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <label class="mb-1 block text-sm font-medium text-slate-700">Descripción</label>
+        {{ producto_form.descripcion }}
+    </div>
+
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+        <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Precio</label>
+            {{ producto_form.precio }}
+        </div>
+        <div class="space-y-3 self-end">
+            <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                {{ producto_form.disponible }}
+                Producto disponible
+            </label>
+            <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                {{ producto_form.disponible_todos_los_dias }}
+                Mostrar en todos los menús diarios
+            </label>
+        </div>
+    </div>
+
+    <button type="submit" class="mt-5 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500">Guardar cambios del producto</button>
+</form>
+{% endif %}
+
+<script>
+    // Actualiza el contador de productos seleccionados para feedback inmediato.
+    (function () {
+        const checks = document.querySelectorAll('input[name="productos"]');
+        const contador = document.getElementById('contador-seleccion');
+
+        function actualizar() {
+            const total = Array.from(checks).filter((item) => item.checked).length;
+            contador.textContent = String(total);
+        }
+
+        checks.forEach((check) => check.addEventListener('change', actualizar));
+        actualizar();
+    })();
+</script>
+{% endblock %}

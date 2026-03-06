@@ -1,0 +1,38 @@
+#estas son las credenciales de gmail para poder enviar correos
+#variables de entorno para no exponer las credenciales en el código
+# el EMAIL_BACKEND es el que se usa para enviar correos desde django, 
+# en este caso se usa el backend de smtp de django, que es el que se usa para enviar correos desde gmail
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+# el EMAIL_HOST es el servidor de correo que se usa para enviar correos desde django 
+#cambiar el valor de email_host para que se use el correo de gmail o usar otro 
+# correo para enviar los correos desde django
+EMAIL_HOST=smtp.gmail.com
+
+# el EMAIL_PORT es el puerto de conexión al servidor de
+# correo que se usa para enviar correos desde django
+EMAIL_PORT=587
+# el EMAIL_USE_TLS es una variable booleana que indica si se debe usar TLS 
+# (Transport Layer Security) para la conexión al servidor de correo
+EMAIL_USE_TLS=True    
+# el EMAIL_HOST_USER es el usuario de correo que se usa para enviar correos desde django
+#eso quiere decir que se usa un correo de gmail, y el usuario es el mismo que se usa para
+#acceder a la cuenta de gmail
+EMAIL_HOST_USER=tu_correo
+#el EMAIL_HOST_PASSWORD es la contraseña se recomienda no usar la contraseña original si no una 
+# app password de gmail clave unica y especifica sin usar la contraseña original de la cuenta de gmail
+# para evitar problemas de seguridad al enviar correos desde django
+#por medio de este enlace se puede generar una app password de gmail clave unica
+#https://myaccount.google.com/apppasswords
+EMAIL_HOST_PASSWORD=app_password
+#DEFAULT_FROM_EMAIL es el email de la cuenta de gmail que se usa para enviar los correos 
+# desde django y es importante que sea la misma que se usa en el correo de gmail 
+# para evitar problemas de autenticación al enviar correos desde django
+DEFAULT_FROM_EMAIL=tu_correo@gmail.com
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY=secret-key 
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG=True
+
+ALLOWED_HOSTS=127.0.0.1,localhost

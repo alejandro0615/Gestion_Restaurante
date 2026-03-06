@@ -1,0 +1,102 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Encabezado para cambiar contraseña #}
+<div class="mb-8 rounded-2xl bg-gradient-to-r via-violet-600 to-indigo-600 p-6 text-white shadow-lg">
+    <h2 class="text-3xl font-bold">Cambiar contraseña</h2>
+    <p class="mt-1 text-sm text-white/90">Por seguridad, elige una contraseña fuerte y diferente a la anterior.</p>
+</div>
+
+{# Tarjeta con formulario de cambio de contraseña #}
+<div class="mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-lg">
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        {# Campo contraseña actual #}
+        <div>
+            <label for="{{ form.contraseña_actual.id_for_label }}" class="block text-sm font-medium text-slate-700">
+                {{ form.contraseña_actual.label }}
+            </label>
+            <div class="relative mt-1">
+                {{ form.contraseña_actual }}
+                <button type="button" class="toggle-password absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-50" data-target="{{ form.contraseña_actual.id_for_label }}">
+                    Mostrar
+                </button>
+            </div>
+            {% if form.contraseña_actual.errors %}
+                <p class="mt-1 text-xs text-red-600">{{ form.contraseña_actual.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        {# Campo contraseña nueva #}
+        <div>
+            <label for="{{ form.contraseña_nueva.id_for_label }}" class="block text-sm font-medium text-slate-700">
+                {{ form.contraseña_nueva.label }}
+            </label>
+            <div class="relative mt-1">
+                {{ form.contraseña_nueva }}
+                <button type="button" class="toggle-password absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-50" data-target="{{ form.contraseña_nueva.id_for_label }}">
+                    Mostrar
+                </button>
+            </div>
+            {% if form.contraseña_nueva.errors %}
+                <p class="mt-1 text-xs text-red-600">{{ form.contraseña_nueva.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        {# Campo confirmación de contraseña nueva #}
+        <div>
+            <label for="{{ form.contraseña_nueva_confirmacion.id_for_label }}" class="block text-sm font-medium text-slate-700">
+                {{ form.contraseña_nueva_confirmacion.label }}
+            </label>
+            <div class="relative mt-1">
+                {{ form.contraseña_nueva_confirmacion }}
+                <button type="button" class="toggle-password absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-50" data-target="{{ form.contraseña_nueva_confirmacion.id_for_label }}">
+                    Mostrar
+                </button>
+            </div>
+            {% if form.contraseña_nueva_confirmacion.errors %}
+                <p class="mt-1 text-xs text-red-600">{{ form.contraseña_nueva_confirmacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        {# Errores generales del formulario #}
+        {% if form.non_field_errors %}
+            <div class="rounded-lg border border-red-300 bg-red-50 p-3">
+                <p class="text-sm font-medium text-red-800">{{ form.non_field_errors.0 }}</p>
+            </div>
+        {% endif %}
+        
+        {# Botones de acción #}
+        <div class="flex gap-3 pt-4">
+            <a href="{% url 'inicio' %}" class="btn-brand flex-1">Cancelar</a>
+            <button type="submit" class="btn-brand flex-1">Cambiar contraseña</button>
+        </div>
+    </form>
+    
+    {# Consejo de seguridad #}
+    <div class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-3">
+        <p class="text-xs font-medium text-amber-800">
+            💡 Consejo: Usa una contraseña con al menos 8 caracteres, combinando letras y números.
+        </p>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const botones = document.querySelectorAll('.toggle-password');
+
+        botones.forEach(function (boton) {
+            boton.addEventListener('click', function () {
+                const targetId = boton.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                if (!input) return;
+
+                const esPassword = input.type === 'password';
+                input.type = esPassword ? 'text' : 'password';
+                boton.textContent = esPassword ? 'Ocultar' : 'Mostrar';
+            });
+        });
+    })();
+</script>
+{% endblock %}

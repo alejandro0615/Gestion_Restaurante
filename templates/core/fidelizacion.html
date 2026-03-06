@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Encabezado de la vista de canje para cliente #}
+<div class="mb-8 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 p-6 text-white shadow-lg">
+    <h2 class="mb-1 text-3xl font-bold">Canjear código</h2>
+    <p class="text-sm text-emerald-100">Ingresa el código que recibiste por correo. Si es válido y no ha sido usado, te dará <strong>50 puntos gratis</strong>.</p>
+</div>
+
+{# Única card para validar código personal del cliente autenticado #}
+<div class="max-w-xl rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-5 shadow-sm">
+    <h3 class="mb-1 text-lg font-semibold text-slate-900">Validar código recibido</h3>
+    <p class="mb-4 text-sm text-slate-600">Cliente: <strong>{{ cliente.nombre }}</strong> · Puntos actuales: <span class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ cliente.puntos }}</span></p>
+
+    <form method="post">
+        {% csrf_token %}
+        <label class="mb-1 block text-sm font-medium text-slate-700">Código</label>
+        {{ canje_form.codigo }}
+
+        <button class="mt-4 rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white shadow-sm transition hover:bg-emerald-500" type="submit">Canjear código</button>
+    </form>
+</div>
+
+{% if beneficio_regalo %}
+<div class="mt-6 max-w-xl rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-100 to-yellow-50 p-5 shadow-sm">
+    <h3 class="text-lg font-bold text-amber-900">🎁 Tu regalo está listo</h3>
+    <p class="mt-1 text-sm text-amber-800">{{ beneficio_regalo.descripcion }}</p>
+    {% if beneficio_regalo.tipo == 'descuento_virtual' %}
+        <p class="mt-2 text-sm text-amber-900">
+            Es un beneficio <strong>virtual</strong>: úsalo en <strong>Hacer pedido</strong>, en la sección de promoción.
+        </p>
+    {% elif beneficio_regalo.tipo == 'bebida_gratis' %}
+        <p class="mt-2 text-sm text-amber-900">
+            Reclámalo en <strong>caja del restaurante</strong> presentando tu <strong>cédula o correo registrado</strong>.
+        </p>
+    {% endif %}
+    <p class="mt-1 text-xs text-amber-700">Asignado el {{ beneficio_regalo.otorgado_en|date:'d/m/Y H:i' }}.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,266 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Encabezado principal de listado de clientes para staff #}
+<div class="mb-8 rounded-2xl bg-gradient-to-r  from-emerald-500 to-teal-500 p-5 text-white shadow-lg">
+    <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div>
+            <h2 class="text-3xl font-bold">Listado de clientes</h2>
+            <p class="mt-1 text-sm text-white/90">Consulta, busca y gestiona los datos de todos los clientes registrados.</p>
+        </div>
+        <span class="rounded-full bg-white/20 px-4 py-2 text-sm font-semibold">Total: {{ total_clientes }} cliente(s)</span>
+    </div>
+</div>
+
+{# Formulario de búsqueda con filtro dinámico #}
+<form method="get" class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <label class="block text-sm font-medium text-slate-700">Buscar cliente</label>
+    <div class="mt-2 flex flex-col gap-2 md:flex-row">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ busqueda }}" 
+            placeholder="Por nombre, correo, cédula o teléfono..." 
+            class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+        >
+        <button type="submit" class="btn-brand whitespace-nowrap">Buscar</button>
+        {% if busqueda %}<a href="{% url 'listar_clientes' %}" class="flex-1 rounded-xl border bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200">Limpiar</a>{% endif %}
+    </div>
+</form>
+
+{# Tabla de clientes con información clave y acciones #}
+<div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm">
+    <table class="min-w-full divide-y divide-slate-200 bg-white text-sm">
+        <thead class="bg-brand-900 text-left text-black">
+            <tr>
+                <th class="px-4 py-3 font-semibold">Nombre</th>
+                <th class="px-4 py-3 font-semibold">Cédula</th>
+                <th class="px-4 py-3 font-semibold">Correo</th>
+                <th class="px-4 py-3 font-semibold">Teléfono</th>
+                <th class="px-4 py-3 font-semibold">Puntos</th>
+                <th class="px-4 py-3 font-semibold">Regalo</th>
+                <th class="px-4 py-3 font-semibold">Registrado</th>
+                <th class="px-4 py-3 font-semibold text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for cliente in clientes %}
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="px-4 py-3">
+                        <span class="font-semibold text-slate-900">{{ cliente.nombre }}</span>
+                    </td>
+                    <td class="px-4 py-3 text-slate-600">{{ cliente.cedula}}</td>
+                    <td class="px-4 py-3 text-slate-600">{{ cliente.email}}</td>
+                    <td class="px-4 py-3 text-slate-600">{{cliente.telefono}}</td>
+                    <td class="px-4 py-3">
+                        {# Muestra puntos con color según si hay regalo asignado #}
+                        <span class="inline-flex rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+                            {{ cliente.puntos }} pts
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        {# Indicador visual si el cliente tiene regalo por 1000 puntos #}
+                        {% if cliente.id in regalos_pendientes_ids %}
+                            <div class="flex flex-col items-center gap-1">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">
+                                    🎁 Pendiente de reclamar
+                                </span>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action_type" value="marcar_regalo_reclamado">
+                                    <input type="hidden" name="cliente_id" value="{{ cliente.id }}">
+                                    <button type="submit" class="rounded-md bg-emerald-600 px-2 py-1 text-[11px] font-semibold text-white transition hover:bg-emerald-500">
+                                        Marcar reclamado
+                                    </button>
+                                </form>
+                            </div>
+                        {% elif cliente.id in regalos_reclamados_ids %}
+                            <span class="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2 py-1 text-xs font-semibold text-slate-700">
+                                ✓ Reclamado
+                            </span>
+                        {% elif cliente.puntos >= 1000 %}
+                            <span class="inline-flex rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">
+                                Pendiente
+                            </span>
+                        {% else %}
+                            <span class="text-xs text-slate-400">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-xs text-slate-500">{{ cliente.creado_en|date:'d/m/Y' }}</td>
+                    <td class="px-4 py-3 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button
+                                type="button"
+                                class="rounded-lg bg-brand-600 px-2.5 py-1.5 text-xs font-semibold text-black transition hover:bg-brand-500"
+                                data-action="abrir-editar"
+                                data-cliente-id="{{ cliente.id }}"
+                                data-cliente-nombre="{{ cliente.nombre }}"
+                                data-cliente-puntos="{{ cliente.puntos }}"
+                            >
+                                Editar puntos
+                            </button>
+                            <button
+                                type="button"
+                                class="rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-black transition hover:bg-red-500"
+                                data-action="abrir-eliminar"
+                                data-cliente-id="{{ cliente.id }}"
+                                data-cliente-nombre="{{ cliente.nombre|escapejs }}"
+                            >
+                                Eliminar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="8" class="px-4 py-6 text-center text-slate-500">
+                        {% if busqueda %}
+                            No se encontraron clientes con "{{ busqueda }}"
+                        {% else %}
+                            No hay clientes registrados aún
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# Modal para editar puntos inline #}
+<div id="modal-editar-puntos" class="fixed inset-0 z-40 hidden items-center justify-center bg-slate-900/60 px-4">
+    <div class="w-full max-w-sm rounded-2xl border border-slate-200 bg-black p-6 shadow-2xl">
+        <h4 class="text-xl font-bold text-slate-900">Editar puntos</h4>
+        <p id="cliente-nombre" class="mt-1 text-sm text-slate-600"></p>
+        
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <input type="hidden" name="action_type" value="update_puntos">
+            <input type="hidden" name="cliente_id" id="cliente-id" value="">
+            
+            <label class="block text-sm font-medium text-slate-700">Nuevos puntos</label>
+            <input 
+                type="number" 
+                name="puntos" 
+                id="puntos-input" 
+                min="0" 
+                class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                placeholder="Ej: 500"
+            >
+            
+            <div class="mt-5 flex items-center justify-end gap-2">
+                <button type="button" id="cancelar-modal-editar" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Cancelar</button>
+                <button type="submit" class="btn-brand">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Modal para confirmar eliminación de cliente #}
+<div id="modal-eliminar-cliente" class="fixed inset-0 z-40 hidden items-center justify-center bg-slate-900/60 px-4">
+    <div class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+        <h4 class="text-xl font-bold text-slate-900">Eliminar cliente</h4>
+        <p class="mt-2 text-sm text-slate-600">Esta acción no se puede deshacer.</p>
+        <p id="cliente-nombre-eliminar" class="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700"></p>
+
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="action_type" value="delete_cliente">
+            <input type="hidden" name="cliente_id" id="cliente-id-eliminar" value="">
+
+            <div class="flex items-center justify-end gap-2">
+                <button type="button" id="cancelar-modal-eliminar" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Cancelar</button>
+                <button type="submit" class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-black transition hover:bg-red-500">Sí, eliminar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Pie con enlaces rápidos a panel de registro #}
+<div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-center">
+    <p class="text-sm text-slate-600">¿Necesitas registrar un nuevo cliente?</p>
+    <br>
+    <a href="{% url 'registrar_cliente_panel' %}" class="btn-brand mt-2 inline-block">Ir a registrar cliente</a>
+</div>
+
+{# JavaScript para manejo del modal de edición #}
+<script>
+    (function () {
+        const modal = document.getElementById('modal-editar-puntos');
+        const cancelarBtn = document.getElementById('cancelar-modal-editar');
+        const clienteIdInput = document.getElementById('cliente-id');
+        const clienteNombreSpan = document.getElementById('cliente-nombre');
+        const puntosInput = document.getElementById('puntos-input');
+        const modalEliminar = document.getElementById('modal-eliminar-cliente');
+        const clienteIdEliminarInput = document.getElementById('cliente-id-eliminar');
+        const clienteNombreEliminar = document.getElementById('cliente-nombre-eliminar');
+        const cancelarEliminarBtn = document.getElementById('cancelar-modal-eliminar');
+
+        // Abre el modal para editar puntos de un cliente.
+        window.abrirModalEditar = function (clienteId, clienteNombre, puntos) {
+            clienteIdInput.value = clienteId;
+            clienteNombreSpan.textContent = 'Cliente: ' + clienteNombre;
+            puntosInput.value = puntos;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            puntosInput.focus();
+        };
+
+        // Abre el modal de eliminación de cliente.
+        window.abrirModalEliminar = function (clienteId, clienteNombre) {
+            clienteIdEliminarInput.value = clienteId;
+            clienteNombreEliminar.textContent = 'Cliente: ' + clienteNombre;
+            modalEliminar.classList.remove('hidden');
+            modalEliminar.classList.add('flex');
+        };
+
+        // Cierra el modal.
+        function cerrarModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function cerrarModalEliminar() {
+            modalEliminar.classList.add('hidden');
+            modalEliminar.classList.remove('flex');
+        }
+
+        if (cancelarBtn) {
+            cancelarBtn.addEventListener('click', cerrarModal);
+        }
+        if (cancelarEliminarBtn) {
+            cancelarEliminarBtn.addEventListener('click', cerrarModalEliminar);
+        }
+
+        const botonesEliminar = document.querySelectorAll('button[data-action="abrir-eliminar"]');
+        botonesEliminar.forEach(function (boton) {
+            boton.addEventListener('click', function () {
+                const clienteId = boton.getAttribute('data-cliente-id');
+                const clienteNombre = boton.getAttribute('data-cliente-nombre') || '';
+                window.abrirModalEliminar(clienteId, clienteNombre);
+            });
+        });
+
+        const botonesEditar = document.querySelectorAll('button[data-action="abrir-editar"]');
+        botonesEditar.forEach(function (boton) {
+            boton.addEventListener('click', function () {
+                const clienteId = boton.getAttribute('data-cliente-id');
+                const clienteNombre = boton.getAttribute('data-cliente-nombre') || '';
+                const clientePuntos = Number(boton.getAttribute('data-cliente-puntos') || 0);
+                window.abrirModalEditar(clienteId, clienteNombre, clientePuntos);
+            });
+        });
+
+        // Cierra al hacer clic fuera del cuadro.
+        modal.addEventListener('click', function (event) {
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        });
+        modalEliminar.addEventListener('click', function (event) {
+            if (event.target === modalEliminar) {
+                cerrarModalEliminar();
+            }
+        });
+    })();
+</script>
+{% endblock %}

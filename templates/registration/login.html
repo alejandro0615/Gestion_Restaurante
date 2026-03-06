@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Contenedor visual principal del login #}
+<section class="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+    <div class="grid md:grid-cols-2">
+        {# Lado izquierdo decorativo con mensaje principal #}
+        <div class="relative hidden bg-gradient-to-br from-blue-600 to-indigo-700 p-8 text-white md:block">
+            <div class="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10"></div>
+            <div class="absolute -bottom-10 -left-10 h-36 w-36 rounded-full bg-white/10"></div>
+            <h2 class="relative z-10 text-3xl font-bold">Bienvenido al Restaurante Dulce Pecado</h2>
+            <p class="relative z-10 mt-3 text-sm text-blue-100">Inicia sesión Premiamos tu fidelidad </p>
+            <div class="relative z-10 mt-8 rounded-xl bg-white/10 p-4 text-sm">
+                <p>✅ Carta diaria por días</p>
+                <p>✅ Gestión de pedidos en tiempo real</p>
+                <p>✅ Regalos por puntos acumulados</p>
+            </div>
+        </div>
+
+        {# Lado derecho con formulario interactivo de autenticación #}
+        <div class="p-6 md:p-8">
+            <h3 class="mb-2 text-2xl font-bold text-slate-900">Iniciar sesión</h3>
+            <p class="mb-5 text-sm text-slate-600">Accede con tu usuario y contraseña.</p>
+
+            {% if form.errors %}
+                {# Mensaje de error cuando las credenciales no coinciden #}
+                <p class="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">Usuario o contraseña incorrectos. Inténtalo de nuevo.</p>
+            {% endif %}
+
+            {% if next %}
+                {% if user.is_authenticated %}
+                    {# Aviso si el usuario autenticado no tiene permisos para la página destino #}
+                    <p class="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">Tu cuenta no tiene acceso a esta página.</p>
+                {% else %}
+                    {# Aviso para usuarios anónimos que requieren autenticación previa #}
+                    <p class="mb-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">Debes iniciar sesión para continuar.</p>
+                {% endif %}
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}" class="space-y-4">
+                {% csrf_token %}
+
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700">Usuario</label>
+                    {{ form.username }}
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700">Contraseña</label>
+                    <div class="relative">
+                        {{ form.password }}
+                        <button id="toggle-password" type="button" class="absolute inset-y-0 right-2 my-auto rounded-md px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100">Mostrar</button>
+                    </div>
+                </div>
+
+                <input type="hidden" name="next" value="{{ next }}">
+                <button class="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-blue-500" type="submit">Entrar</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Aplica clases Tailwind y activa interacciones del formulario de login.
+    (function () {
+        const claseCampo = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition ring-blue-500 focus:ring focus:border-blue-500';
+        const usuario = document.getElementById('id_username');
+        const password = document.getElementById('id_password');
+        const toggle = document.getElementById('toggle-password');
+
+        if (usuario) {
+            usuario.className = claseCampo;
+            usuario.placeholder = 'Ingresa tu usuario';
+        }
+        if (password) {
+            password.className = claseCampo + ' pr-20';
+            password.placeholder = 'Ingresa tu contraseña';
+        }
+
+        if (toggle && password) {
+            toggle.addEventListener('click', function () {
+                const esPassword = password.type === 'password';
+                password.type = esPassword ? 'text' : 'password';
+                toggle.textContent = esPassword ? 'Ocultar' : 'Mostrar';
+            });
+        }
+    })();
+</script>
+{% endblock %}

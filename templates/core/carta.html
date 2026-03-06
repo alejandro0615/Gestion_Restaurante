@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Título principal de la página de carta #}
+<div class="mb-6 rounded-2xl bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 p-6 text-white shadow-lg">
+    <h2 class="text-3xl font-bold">Carta del restaurante</h2>
+    <p class="mt-1 text-sm text-blue-100">Explora el menú del día y descubre platos con mucho sabor.</p>
+</div>
+
+{# Formulario de filtros por búsqueda y categoría #}
+<form method="get" class="mb-8 grid gap-4 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 to-cyan-50 p-4 md:grid-cols-4" id="filtro-carta">
+    <label class="block text-sm font-medium text-slate-700">Día del menú
+        <select class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-blue-500 focus:ring" name="dia" id="dia-carta">
+            {% for clave, etiqueta in dias_semana %}
+                <option value="{{ clave }}" {% if dia == clave %}selected{% endif %}>{{ etiqueta }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label class="block text-sm font-medium text-slate-700">Buscar producto
+        <input class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-blue-500 focus:ring" type="text" id="busqueda-carta" name="q" value="{{ busqueda }}" placeholder="Ej. hamburguesa, pizza, bebida" autocomplete="off">
+    </label>
+    <label class="block text-sm font-medium text-slate-700">Categoría
+        <select class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-blue-500 focus:ring" name="categoria" id="categoria-carta">
+            <option value="">Todas</option>
+            {% for cat in categorias %}
+                <option value="{{ cat.id }}" {% if categoria_id == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.nombre }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <div class="flex items-end gap-2">
+        <button class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-sm transition hover:bg-blue-500" type="submit">Filtrar</button>
+        <a class="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white shadow-sm transition hover:bg-indigo-500" href="{% url 'descargar_carta_pdf' %}?dia={{ dia }}">Descargar PDF</a>
+    </div>
+</form>
+
+{# Grid de productos que cumplen los filtros seleccionados #}
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {% for producto in productos %}
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <div class="flex items-start justify-between gap-2">
+                <strong class="text-lg text-slate-900">{{ producto.nombre }}</strong>
+                {% if producto.disponible_todos_los_dias %}
+                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">Disponible todos los días</span>
+                {% endif %}
+            </div>
+            {# Bloque descriptivo para que el cliente vea claramente qué trae cada plato #}
+            <div class="mt-3 rounded-lg border border-indigo-100 bg-gradient-to-r from-indigo-50 to-cyan-50 p-3">
+                <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">¿Qué trae?</p>
+                <p class="mt-1 text-sm text-slate-700">{{ producto.descripcion|default:'Incluye proteína del día, acompañante, ensalada y bebida.' }}</p>
+            </div>
+            <p class="mt-2 text-sm"><span class="font-semibold">Categoría:</span> {{ producto.categoria.nombre|default:'Sin categoría' }}</p>
+            <p class="text-sm font-semibold"><span class="font-semibold">Precio:</span> <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-700">${{ producto.precio }}</span></p>
+        </div>
+    {% empty %}
+        <p class="text-sm text-slate-500">No se encontraron productos con ese filtro.</p>
+    {% endfor %}
+</div>
+
+<script>
+    // Autoenvío del formulario para mejorar experiencia al filtrar sin botón extra.
+    (function () {
+        const form = document.getElementById('filtro-carta');
+        const selectDia = document.getElementById('dia-carta');
+        const inputBusqueda = document.getElementById('busqueda-carta');
+        const selectCategoria = document.getElementById('categoria-carta');
+        let temporizador;
+
+        // Espera breve para evitar enviar en cada tecla inmediatamente.
+        function enviarConRetraso() {
+            clearTimeout(temporizador);
+            temporizador = setTimeout(function () {
+                form.submit();
+            }, 300);
+        }
+
+        // Filtra por texto mientras el usuario escribe.
+        inputBusqueda.addEventListener('input', enviarConRetraso);
+        // Cambia inmediatamente al menú del día seleccionado.
+        selectDia.addEventListener('change', function () {
+            form.submit();
+        });
+        // Filtra instantáneamente cuando cambia la categoría.
+        selectCategoria.addEventListener('change', function () {
+            form.submit();
+        });
+    })();
+</script>
+{% endblock %}

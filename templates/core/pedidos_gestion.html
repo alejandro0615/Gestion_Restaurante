@@ -1,0 +1,92 @@
+{% extends 'core/base.html' %}
+
+{% block contenido %}
+{# Encabezado de la vista web de gestión de pedidos #}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 p-5 text-white shadow-lg">
+    <div>
+        <h2 class="text-3xl font-bold">Gestión de pedidos</h2>
+        <p class="text-sm text-emerald-100">Actualiza cada pedido como pendiente o listo sin usar el panel administrativo.</p>
+    </div>
+    <span class="rounded-full bg-white/20 px-3 py-1 text-sm font-semibold text-white">{{ pedidos|length }} pedidos</span>
+</div>
+
+{# Filtros rápidos por estado del pedido #}
+<div class="mb-5 flex flex-wrap items-center gap-2">
+    <a href="?estado=todos" class="rounded-xl px-3 py-2 text-sm font-medium shadow-sm transition {% if filtro_estado == 'todos' %}bg-slate-900 text-white{% else %}bg-slate-100 text-slate-700 hover:bg-slate-200{% endif %}">
+        Todos
+    </a>
+    <a href="?estado=pendiente" class="rounded-xl px-3 py-2 text-sm font-medium shadow-sm transition {% if filtro_estado == 'pendiente' %}bg-amber-500 text-slate-900{% else %}bg-amber-100 text-amber-800 hover:bg-amber-200{% endif %}">
+        Pendientes
+    </a>
+    <a href="?estado=listo" class="rounded-xl px-3 py-2 text-sm font-medium shadow-sm transition {% if filtro_estado == 'listo' %}bg-emerald-500 text-slate-900{% else %}bg-emerald-100 text-emerald-800 hover:bg-emerald-200{% endif %}">
+        Listos
+    </a>
+</div>
+
+{# Tabla principal con información de pedidos y cambio de estado #}
+<div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm">
+    <table class="min-w-full divide-y divide-slate-200 bg-white text-sm">
+        <thead class="bg-slate-900 text-left text-slate-100">
+            <tr>
+                <th class="px-4 py-3 font-semibold">Pedido</th>
+                <th class="px-4 py-3 font-semibold">Cliente</th>
+                <th class="px-4 py-3 font-semibold">Productos</th>
+                <th class="px-4 py-3 font-semibold">Tipo servicio</th>
+                <th class="px-4 py-3 font-semibold">Total</th>
+                <th class="px-4 py-3 font-semibold">Estado actual</th>
+                <th class="px-4 py-3 font-semibold">Cambiar estado</th>
+                <th class="px-4 py-3 font-semibold">Fecha</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for pedido in pedidos %}
+                <tr class="hover:bg-slate-50">
+                    <td class="px-4 py-3 font-semibold text-slate-900">#{{ pedido.id }}</td>
+                    <td class="px-4 py-3">{{ pedido.cliente.nombre }}</td>
+                    <td class="px-4 py-3">
+                        <ul class="space-y-1">
+                            {% for item in pedido.items.all %}
+                                <li class="text-slate-700">{{ item.cantidad }} x {{ item.producto.nombre }}</li>
+                            {% empty %}
+                                <li class="text-slate-400">Sin productos</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td class="px-4 py-3">
+                        {% if pedido.tipo_servicio == 'domicilio' %}
+                            <span class="rounded-full bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-700">Domicilio</span>
+                        {% else %}
+                            <span class="rounded-full bg-violet-100 px-2 py-1 text-xs font-semibold text-violet-700">En sitio</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3">${{ pedido.total }}</td>
+                    <td class="px-4 py-3">
+                        {% if pedido.estado == 'entregado' %}
+                            <span class="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">Listo</span>
+                        {% else %}
+                            <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">Pendiente</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3">
+                        {# Formulario por fila para actualizar estado del pedido #}
+                        <form method="post" class="flex items-center gap-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="pedido_id" value="{{ pedido.id }}">
+                            <select name="estado" class="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm outline-none ring-blue-500 focus:ring">
+                                <option value="pendiente" {% if pedido.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                <option value="entregado" {% if pedido.estado == 'entregado' %}selected{% endif %}>Listo</option>
+                            </select>
+                            <button type="submit" class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-blue-500">Guardar</button>
+                        </form>
+                    </td>
+                    <td class="px-4 py-3 text-slate-600">{{ pedido.creado_en|date:'d/m/Y H:i' }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="8" class="px-4 py-6 text-center text-slate-500">No hay pedidos registrados.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
