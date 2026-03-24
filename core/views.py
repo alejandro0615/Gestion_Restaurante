@@ -134,20 +134,20 @@ def registro_cliente(request):
 
 			try:
 				send_mail(
-					subject='Credenciales de acceso - Restaurante',
-					message=(
-						f'Hola {nombre},\n\n'
-						'Se creó tu cuenta de cliente en la plataforma del restaurante Dulce Pecado.\n'
-						'tus credenciales de acceso son: '
-						f'Usuario: {username}\n'
-						f'Contraseña temporal: {password_temporal}\n\n'
-						'Por seguridad, inicia sesión y cambia tu contraseña desde tu perfil.\n\n'
-						'apreciamos tu fidelidad y esperamos que disfrutes de nuestros productos y promociones.'
-						'Restaurante Dulce Pecado\n'
-					),
-					from_email=None,
-					recipient_list=[email],
-					fail_silently=False,
+    				subject='Credenciales de acceso - Restaurante',
+    				message=(
+        			f'Hola {nombre},\n\n'
+        			'Se creó tu cuenta de cliente en la plataforma del restaurante Dulce Pecado.\n'
+        			'Tus credenciales de acceso son: '
+        			f'Usuario: {username}\n'
+        			f'Contraseña temporal: {password_temporal}\n\n'
+        			'Por seguridad, inicia sesión y cambia tu contraseña desde tu perfil.\n\n'
+        			'Apreciamos tu fidelidad y esperamos que disfrutes de nuestros productos y promociones.\n'
+        			'Restaurante Dulce Pecado\n'
+   					),
+    				from_email=os.environ.get('EMAIL_USER'),
+    				recipient_list=[email],
+    				fail_silently=False,
 				)
 				messages.success(request, 'Registro exitoso. Revisa tu correo Gmail para ver tu contraseña temporal.')
 			except Exception:
